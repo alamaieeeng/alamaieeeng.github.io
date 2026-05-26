@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Simu-Solv | Engineering Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07090f;
+    --surface: #0d1117;
+    --surface2: #131926;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00d4a8;
+    --accent2: #3b82f6;
+    --accent3: #f59e0b;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --em-color: #00d4a8;
+    --thermal-color: #f97316;
+    --cyber-color: #818cf8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* GRID OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,168,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,168,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(7,9,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  .nav-cta {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--accent);
+    color: #07090f;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10rem 4rem 6rem;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,212,168,0.12) 0%, transparent 70%);
+    top: -100px; right: -150px;
+    pointer-events: none;
+  }
+  .hero-glow2 {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+    bottom: 0; left: -100px;
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-label::before {
+    content: '';
+    display: block;
+    width: 32px; height: 1px;
+    background: var(--accent);
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    max-width: 800px;
+    margin-bottom: 2rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin-bottom: 3rem;
+    line-height: 1.75;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #07090f;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.9rem 2rem;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-secondary {
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.9rem 2rem;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-stats {
+    display: flex;
+    gap: 4rem;
+    margin-top: 5rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+    max-width: 560px;
+  }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem;
+    color: var(--text);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+
+  /* SECTION COMMON */
+  section { position: relative; z-index: 1; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  /* SERVICES */
+  #services {
+    padding: 8rem 4rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .services-header {
+    max-width: 600px;
+    margin-bottom: 5rem;
+  }
+  .services-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+  .services-header p {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .service-card {
+    background: var(--surface);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .service-card:hover { background: var(--surface2); }
+
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    transition: opacity 0.3s;
+    opacity: 0.6;
+  }
+  .service-card:hover::before { opacity: 1; }
+  .service-card.em::before { background: var(--em-color); }
+  .service-card.thermal::before { background: var(--thermal-color); }
+  .service-card.cyber::before { background: var(--cyber-color); }
+
+  .service-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .service-icon {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  .service-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .service-card.em h3 { color: var(--em-color); }
+  .service-card.thermal h3 { color: var(--thermal-color); }
+  .service-card.cyber h3 { color: var(--cyber-color); }
+
+  .service-card p {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.75;
+    margin-bottom: 2rem;
+  }
+
+  .service-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .service-card.em .tag { border-color: rgba(0,212,168,0.2); color: var(--em-color); }
+  .service-card.thermal .tag { border-color: rgba(249,115,22,0.2); color: var(--thermal-color); }
+  .service-card.cyber .tag { border-color: rgba(129,140,248,0.2); color: var(--cyber-color); }
+
+  /* ABOUT */
+  #about {
+    padding: 8rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .about-text h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  .about-text p {
+    color: var(--muted);
+    font-size: 0.97rem;
+    line-height: 1.85;
+    margin-bottom: 1.2rem;
+  }
+
+  .about-visual {
+    position: relative;
+  }
+
+  .diagram-box {
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    background: var(--surface);
+    position: relative;
+  }
+  .diagram-box::after {
+    content: 'SIMULATION ENGINE';
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    position: absolute;
+    top: 1rem; right: 1rem;
+  }
+
+  .diagram-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .diagram-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .diagram-row:nth-child(1) .diagram-dot { background: var(--em-color); box-shadow: 0 0 8px var(--em-color); }
+  .diagram-row:nth-child(2) .diagram-dot { background: var(--thermal-color); box-shadow: 0 0 8px var(--thermal-color); }
+  .diagram-row:nth-child(3) .diagram-dot { background: var(--cyber-color); box-shadow: 0 0 8px var(--cyber-color); }
+
+  .diagram-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    flex: 1;
+  }
+
+  .diagram-bar-wrap {
+    width: 100px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .diagram-bar {
+    height: 100%;
+    border-radius: 2px;
+    animation: barGrow 2s ease forwards;
+  }
+  @keyframes barGrow { from { width: 0; } }
+  .diagram-row:nth-child(1) .diagram-bar { width: 82%; background: var(--em-color); animation-delay: 0.2s; }
+  .diagram-row:nth-child(2) .diagram-bar { width: 68%; background: var(--thermal-color); animation-delay: 0.5s; }
+  .diagram-row:nth-child(3) .diagram-bar { width: 91%; background: var(--cyber-color); animation-delay: 0.8s; }
+
+  .diagram-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* WHY US */
+  #why {
+    padding: 8rem 4rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .why-header {
+    text-align: center;
+    max-width: 550px;
+    margin: 0 auto 5rem;
+  }
+  .why-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .why-header p { color: var(--muted); font-size: 0.97rem; line-height: 1.75; }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .why-card {
+    padding: 2rem 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .why-card:hover { border-color: rgba(0,212,168,0.3); transform: translateY(-4px); }
+
+  .why-card-icon {
+    font-size: 1.6rem;
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+  .why-card h4 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 0.6rem;
+    color: var(--text);
+  }
+  .why-card p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* CONTACT */
+  #contact {
+    padding: 8rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+
+  .contact-text h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+  .contact-text p {
+    color: var(--muted);
+    font-size: 0.97rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  .contact-detail {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .contact-detail-icon { font-size: 1.1rem; }
+  .contact-detail-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+  }
+  .contact-detail-val {
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-input, .form-select, .form-textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.8rem 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+    resize: vertical;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent);
+  }
+  .form-select option { background: var(--surface); }
+  .form-textarea { min-height: 120px; }
+
+  .form-submit {
+    background: var(--accent);
+    color: #07090f;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: none;
+    padding: 1rem 2.5rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    align-self: flex-start;
+    margin-top: 0.5rem;
+  }
+  .form-submit:hover { opacity: 0.85; }
+
+  /* FOOTER */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 4rem 4rem 2.5rem;
+  }
+
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 3rem;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand .logo { display: block; margin-bottom: 0.75rem; }
+  .footer-brand p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    max-width: 260px;
+    line-height: 1.7;
+  }
+
+  .footer-links h5 {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .footer-links a {
+    font-size: 0.87rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero > * { animation: fadeInUp 0.7s ease forwards; opacity: 0; }
+  .hero-label { animation-delay: 0.1s; }
+  .hero h1 { animation-delay: 0.25s; }
+  .hero-sub { animation-delay: 0.4s; }
+  .hero-actions { animation-delay: 0.55s; }
+  .hero-stats { animation-delay: 0.7s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1024px) {
+    .services-grid { grid-template-columns: 1fr; }
+    .why-grid { grid-template-columns: repeat(2, 1fr); }
+    #about, #contact { grid-template-columns: 1fr; gap: 3rem; }
+    nav { padding: 1.2rem 2rem; }
+    .hero, #services, #about, #why, #contact, footer { padding-left: 2rem; padding-right: 2rem; }
+  }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .hero-stats { gap: 2.5rem; }
+    .why-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">Simu<span>-</span>Solv</a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get in Touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="hero-label">Engineering Intelligence</div>
+
+  <h1>Precision Modeling<br>for Complex<br><em>Real-World Problems</em></h1>
+
+  <p class="hero-sub">
+    Simu-Solv delivers high-fidelity simulation and analysis across electromagnetic, thermal, mechanical, and cyber domains — turning complex physics into actionable engineering insight.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#services" class="btn-primary">Explore Services</a>
+    <a href="#contact" class="btn-secondary">Start a Project</a>
+  </div>
+
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num">3</div>
+      <div class="stat-label">Core Disciplines</div>
+    </div>
+    <div>
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Physics-Based</div>
+    </div>
+    <div>
+      <div class="stat-num">AI+</div>
+      <div class="stat-label">Enhanced Analysis</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header">
+    <div class="section-label">What We Do</div>
+    <h2>Three Domains.<br>One Integrated Solution.</h2>
+    <p>From Maxwell's equations to machine learning, our team applies rigorous numerical methods and modern computational tools to your toughest engineering challenges.</p>
+  </div>
+
+  <div class="services-grid">
+
+    <div class="service-card em">
+      <div class="service-num">01 / 03</div>
+      <span class="service-icon">⚡</span>
+      <h3>Electromagnetic Modeling & Simulation</h3>
+      <p>Full-wave EM analysis, antenna design, RF interference studies, radar cross-section, and EMC/EMI compliance simulation. We model your system's electromagnetic behavior with field-solver precision.</p>
+      <div class="service-tags">
+        <span class="tag">FEM / FDTD</span>
+        <span class="tag">Antenna Design</span>
+        <span class="tag">EMC / EMI</span>
+        <span class="tag">RF Systems</span>
+        <span class="tag">Radar</span>
+      </div>
+    </div>
+
+    <div class="service-card thermal">
+      <div class="service-num">02 / 03</div>
+      <span class="service-icon">🔥</span>
+      <h3>Thermal & Mechanical Simulation</h3>
+      <p>Structural analysis, heat transfer modeling, fluid-structure interaction, vibration, fatigue, and multi-physics coupling. We validate designs virtually before they're ever built.</p>
+      <div class="service-tags">
+        <span class="tag">FEA / CFD</span>
+        <span class="tag">Heat Transfer</span>
+        <span class="tag">Structural</span>
+        <span class="tag">Fatigue</span>
+        <span class="tag">Multi-physics</span>
+      </div>
+    </div>
+
+    <div class="service-card cyber">
+      <div class="service-num">03 / 03</div>
+      <span class="service-icon">🔐</span>
+      <h3>Cybersecurity & AI Data Analysis</h3>
+      <p>Threat modeling, vulnerability assessment, anomaly detection, and AI-powered data analysis pipelines. We help you understand complex systems — and protect them from adversarial risk.</p>
+      <div class="service-tags">
+        <span class="tag">Threat Modeling</span>
+        <span class="tag">ML / AI</span>
+        <span class="tag">Data Analysis</span>
+        <span class="tag">Anomaly Detection</span>
+        <span class="tag">Security</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-text">
+    <div class="section-label">About Simu-Solv</div>
+    <h2>Built by Engineers.<br>Driven by Insight.</h2>
+    <p>
+      Simu-Solv was founded on a simple principle: the most complex engineering problems deserve the most rigorous analytical tools. We combine deep domain expertise with modern computational methods to deliver simulation-backed decisions.
+    </p>
+    <p>
+      Whether you're designing next-generation electronics, validating structural integrity, or securing a critical system, our team brings the breadth of physics knowledge and software capability to get it right — the first time.
+    </p>
+    <a href="#contact" class="btn-primary" style="margin-top:1rem;">Work With Us</a>
+  </div>
+
+  <div class="about-visual">
+    <div class="diagram-box">
+      <div class="diagram-row">
+        <div class="diagram-dot"></div>
+        <div class="diagram-label">EM Simulation Engine</div>
+        <div class="diagram-bar-wrap"><div class="diagram-bar"></div></div>
+      </div>
+      <div class="diagram-row">
+        <div class="diagram-dot"></div>
+        <div class="diagram-label">Thermal / FEA Solver</div>
+        <div class="diagram-bar-wrap"><div class="diagram-bar"></div></div>
+      </div>
+      <div class="diagram-row">
+        <div class="diagram-dot"></div>
+        <div class="diagram-label">AI Analysis Pipeline</div>
+        <div class="diagram-bar-wrap"><div class="diagram-bar"></div></div>
+      </div>
+      <div class="diagram-status">
+        <div class="status-dot"></div>
+        All systems operational
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div class="why-header">
+    <div class="section-label" style="justify-content:center;">Why Simu-Solv</div>
+    <h2>What Sets Us Apart</h2>
+    <p>We don't just run simulations — we understand the physics, validate the results, and translate findings into decisions you can act on.</p>
+  </div>
+
+  <div class="why-grid">
+    <div class="why-card">
+      <span class="why-card-icon">🎯</span>
+      <h4>Physics-First Approach</h4>
+      <p>Every model is grounded in first principles. No black boxes — we know exactly why the simulation says what it says.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-card-icon">🔬</span>
+      <h4>Multi-Domain Expertise</h4>
+      <p>EM, thermal, structural, and cyber — rare breadth under one roof means no translation loss between disciplines.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-card-icon">🤖</span>
+      <h4>AI-Augmented Workflows</h4>
+      <p>Machine learning accelerates analysis and uncovers patterns that classical methods can miss.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-card-icon">📐</span>
+      <h4>Actionable Deliverables</h4>
+      <p>We produce reports, models, and recommendations your engineering and leadership teams can actually use.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-text">
+    <div class="section-label">Get In Touch</div>
+    <h2>Let's Solve Something<br><em style="font-style:italic;color:var(--accent)">Complex</em> Together.</h2>
+    <p>Tell us about your project. Whether it's a feasibility study, a full simulation campaign, or an ongoing analysis partnership — we're ready to engage.</p>
+
+    <div class="contact-detail">
+      <span class="contact-detail-icon">📧</span>
+      <div>
+        <div class="contact-detail-label">Email</div>
+        <div class="contact-detail-val">contact@simu-solv.com</div>
+      </div>
+    </div>
+    <div class="contact-detail">
+      <span class="contact-detail-icon">📍</span>
+      <div>
+        <div class="contact-detail-label">Location</div>
+        <div class="contact-detail-val">United States</div>
+      </div>
+    </div>
+    <div class="contact-detail">
+      <span class="contact-detail-icon">⏱</span>
+      <div>
+        <div class="contact-detail-label">Response Time</div>
+        <div class="contact-detail-val">Within 1 business day</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input type="text" class="form-input" placeholder="Jane" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input type="text" class="form-input" placeholder="Smith" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" class="form-input" placeholder="jane@company.com" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Organization</label>
+      <input type="text" class="form-input" placeholder="Your company or institution" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Service Area</label>
+      <select class="form-select">
+        <option value="" disabled selected>Select a discipline...</option>
+        <option>Electromagnetic Modeling & Simulation</option>
+        <option>Thermal / Mechanical Simulation</option>
+        <option>Cybersecurity & AI Analysis</option>
+        <option>Multi-domain / Integrated Project</option>
+        <option>Other / Not Sure Yet</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tell Us About Your Project</label>
+      <textarea class="form-textarea" placeholder="Briefly describe the problem, goals, and any relevant constraints..."></textarea>
+    </div>
+    <button type="button" class="form-submit">Send Message →</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="logo">Simu<span>-</span>Solv</a>
+      <p>Precision modeling and simulation for electromagnetic, thermal, mechanical, and cyber challenges.</p>
+    </div>
+    <div class="footer-links">
+      <h5>Services</h5>
+      <ul>
+        <li><a href="#services">EM Simulation</a></li>
+        <li><a href="#services">Thermal & Mechanical</a></li>
+        <li><a href="#services">Cybersecurity & AI</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#why">Why Simu-Solv</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Simu-Solv. All rights reserved.</span>
+    <span>Engineering Intelligence · Simulation · Analysis</span>
+  </div>
+</footer>
+
+</body>
+</html>
